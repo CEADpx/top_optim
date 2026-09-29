@@ -37,6 +37,10 @@ select = ["E4", "E7", "E9", "F"]
 ignore = ["E741"]
 
 [tool.pytest.ini_options]
+# src/ on sys.path for the test run, so the suite works from a clean checkout
+# with nothing installed. Without this the suite cannot import matto at all,
+# and testing a change meant installing the package first.
+pythonpath = ["src"]
 testpaths = ["tests"]
 addopts = "-q -m 'not examples'"
 markers = [

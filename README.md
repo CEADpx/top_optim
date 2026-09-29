@@ -164,33 +164,49 @@ The supplied Conda environment targets Linux or WSL and currently uses Python 3.
 git clone https://github.com/CEADpx/matto.git
 cd matto
 conda env create -f environment.yml
-conda activate confenx
-python -m pip install -e .
+conda activate matto
+python -m pip install .
 ```
+
+Nothing below needs the package installed. Tests and examples both run from a
+clean checkout, so install it only to use `matto` from outside this directory.
+
+Prefer `pip install .` to `pip install -e .`. An editable install writes a path
+file into the environment pointing back at this working tree, and that pointer
+stays until it is uninstalled: the environment then imports whatever is in the
+tree, including a half-finished edit. It is also how a second checkout shadows
+the first, since both claim the name `matto`.
 
 ## Testing
 
-Install the test extra, then run the suite from the repository root:
+Run the suite from the repository root. `pythonpath = ["src"]` in
+`pyproject.toml` puts the sources on the path for the test run, so this needs
+no install:
 
 ```bash
-python -m pip install -e ".[test]"
 python -m pytest
 mpirun -n 1 python -m pytest -m examples
 mpirun -n 2 python -m pytest -m examples
 mpirun -n 4 python -m pytest -m examples
 ```
 
+`pytest` itself is the only requirement: `python -m pip install pytest`, or
+`python -m pip install ".[test]"`.
+
 `python -m pytest` is the fast serial suite: MMA calling convention, a coarse-mesh finite-difference adjoint check, and the restorative-beam first-iteration pin. `-m examples` runs every example for one iteration and is the MPI check.
 
 ## Running an example
 
-Activate `confenx` and install the package in that environment before running anything (`python -m pip install -e .` from the repository root). This is required so `from matto.driver import OptimizationDriver` resolves.
+Run from the repository root with the sources on the path, so
+`from matto.driver import OptimizationDriver` resolves without an install:
 
 ```bash
-conda activate confenx
-python -m pip install -e .
-python examples/Barrera2024_LCE/input_morphing_strip.py
+conda activate matto
+PYTHONPATH=src python examples/Barrera2024_LCE/input_morphing_strip.py
 ```
+
+`PYTHONPATH` applies to the one command and leaves the environment unchanged.
+If the package is installed, drop it.
 
 Other examples are run in the same way:
 

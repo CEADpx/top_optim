@@ -1,4 +1,4 @@
-name: confenx
+name: matto
 
 channels:
   - conda-forge
